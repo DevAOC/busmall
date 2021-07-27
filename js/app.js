@@ -17,7 +17,10 @@ function Product(name, imagePath, imageId) {
   this.timesSeen = 0;
 }
 // --------------------- Prototypes ---------------------
-
+Product.prototype.renderProduct = function(parent) {
+  makeElem('h2', parent, this.name, null, this.imageId);
+  makeElem('img', parent, null, this.imagePath, this.imageId);
+};
 // -------------------- Global functions -----------------
 function addProduct(name, imagePath, imageId) {
   const product = new Product(name, imagePath, imageId);
@@ -68,7 +71,7 @@ function getProducts() { //Add check for same array after
   //   previousImages[i] = currentImages[i];
   // }
 }
-// Not working properly
+
 function repeatImageCheck() {
   let currentImage = getRandomImage();
   for (let i = 0; i < currentImages.length; i++) {
@@ -82,17 +85,16 @@ function repeatImageCheck() {
 }
 
 function renderAllProducts() {
+  const articleElem = makeElem('article', productSec, null, null, null);
   for (let image of currentImages) {
-    const articleElem = makeElem('article', productSec, null, null, null);
-    makeElem('h2', articleElem, image.name, null, image.imageId);
-    makeElem('img', articleElem, null, image.imagePath, image.imageId);
+    image.renderProduct(articleElem);
   }
 }
 
 // function setImagesToDisplay(amount) {
 //   imagesToDisplay = amount;
 // }
-
+// -------------------- Handlers ----------------------
 function handleImageClick(event) {
   const articleId = event.target.id;
   productSec.innerHTML = '';
