@@ -31,10 +31,8 @@ function addProduct(name, imagePath, imageId) {
 
 function checkProductExistance(product) {
   let exists = false;
-  for (let item of productList) {
-    if(item.name === product.name) {
-      exists = true;
-    }
+  if(productList.includes(product)) {
+    exists = true;
   }
   return exists;
 }
@@ -61,10 +59,10 @@ function getRandomImage() {
 
 function getProducts() { //Add check for same array after
   for (let i = 0; i < imagesToDisplay; i++) {
-    if (i === 0) {
+    if (i < 0) {
       currentImages[i] = getRandomImage();
     } else {
-      currentImages[i] = repeatImageCheck(i);
+      currentImages[i] = repeatImageCheck();
     }
   }
   // for (let i = 0; i < currentImages.length; i++) {
@@ -74,11 +72,11 @@ function getProducts() { //Add check for same array after
 
 function repeatImageCheck() {
   let currentImage = getRandomImage();
+  restartLoop:
   for (let i = 0; i < currentImages.length; i++) {
-    console.log(currentImage);
-    if (currentImage.name === currentImages[i].name) {
+    if (currentImages.includes(currentImage)) {
       currentImage = getRandomImage();
-      i = 0;
+      continue restartLoop;
     }
   }
   return currentImage;
