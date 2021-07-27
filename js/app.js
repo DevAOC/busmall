@@ -3,7 +3,7 @@
 const productList = [];
 const currentImages = [];
 const productSec = document.getElementById('productSection');
-const resultsButton = document.getElementById('resultsButton');
+let resultsButton;
 let imagesToDisplay = 3;
 let clickCount = 0;
 
@@ -13,6 +13,7 @@ function Product(name, imagePath, imageId) {
   this.imagePath = imagePath;
   this.imageId = imageId;
   this.votes = 0;
+  this.timesSeen = 0;
 }
 // --------------------- Prototypes ---------------------
 
@@ -76,11 +77,10 @@ function repeatImageCheck() {
 }
 
 function renderAllProducts() {
-  productSec.innerHTML('');
-  for (let i = 0; i < currentImages; i++) {
-    const articleElem = makeElem('article', productSec, null, null, currentImages[i].imageId);
+  for (let i = 0; i < currentImages.length; i++) {
+    const articleElem = makeElem('article', productSec, null, null, null);
     makeElem('h2', articleElem, currentImages[i].name, null, null);
-    makeElem('img', articleElem, null, currentImages[i].imagePath, null);
+    makeElem('img', articleElem, null, currentImages[i].imagePath, currentImages[i].imageId);
   }
 }
 
@@ -90,23 +90,27 @@ function renderAllProducts() {
 
 function handleImageClick(event) {
   const articleId = event.target.id;
+  productSec.innerHTML = '';
   clickCount++;
   for (let i = 0; i < currentImages.length; i++) {
     if (articleId === currentImages[i].imageId) {
       currentImages[i].votes++;
     }
+    currentImages[i].timesSeen++;
   }
   if (clickCount !== 10) {
     getProducts();
     renderAllProducts();
   } else {
-    productSec.innerHTML('');
-    makeElem('button', productSec, 'View Results', null, 'resultsButton');
+    productSec.removeEventListener('click', handleImageClick);
+    resultsButton = makeElem('button', productSec, 'View Results', null, 'resultsButton');
+    resultsButton.addEventListener('click', handleButtonClick);
   }
 }
 
 function handleButtonClick() {
-  productSec.innerHTML('');
+  resultsButton.removeEventListener('click', handleButtonClick);
+  productSec.innerHTML = '';
   const resultsList = makeElem('ul', productSec, null, null, 'resultsList');
   for (let product of productList) {
     makeElem('li', resultsList, `${product.name}: ${product.votes}`);
@@ -114,25 +118,27 @@ function handleButtonClick() {
 }
 // -------------------- Listener -----------------------
 productSec.addEventListener('click', handleImageClick);
-resultsButton.addEventListener('click', handleButtonClick);
 // ------------------ Function Calls ----------------
 
 addProduct('R2D2 Luggage', '../img/bag.jpg', 'bag');
 addProduct('Banana Slicer', '../img/banana.jpg', 'banana');
 addProduct('iPad Stand', '../img/bathroom.jpg', 'bathroom');
-addProduct('R2D2 Luggage', '../img/boots.jpg', 'boots');
-addProduct('R2D2 Luggage', '../img/breakfast.jpg', 'breafast');
-addProduct('R2D2 Luggage', '../img/bubblegum.jpg', 'bubblegum');
-addProduct('R2D2 Luggage', '../img/chair.jpg', 'chair');
-addProduct('R2D2 Luggage', '../img/cthulhu.jpg', 'cthulhu');
-addProduct('R2D2 Luggage', '../img/dog-duck.jpg', 'dogDuck');
-addProduct('R2D2 Luggage', '../img/dragon.jpg', 'dragon');
-addProduct('R2D2 Luggage', '../img/pen.jpg', 'pen');
-addProduct('R2D2 Luggage', '../img/pet-sweep.jpg', 'petSweep');
-addProduct('R2D2 Luggage', '../img/scissors.jpg', 'scissors');
-addProduct('R2D2 Luggage', '../img/shark.jpg', 'shark');
-addProduct('R2D2 Luggage', '../img/sweep.jpg', 'sweep');
-addProduct('R2D2 Luggage', '../img/tauntaun.jpg', 'tauntaun');
-addProduct('R2D2 Luggage', '../img/unicorn.jpg', 'unicorn');
-addProduct('R2D2 Luggage', '../img/water-can.jpg', 'waterCan');
-addProduct('R2D2 Luggage', '../img/wine-glass.jpg', 'wineGlass');
+addProduct('Open Toe Boots', '../img/boots.jpg', 'boots');
+addProduct('Breakfast Machine', '../img/breakfast.jpg', 'breafast');
+addProduct('Meatball Bubblegum', '../img/bubblegum.jpg', 'bubblegum');
+addProduct('Convexed-seat Chair', '../img/chair.jpg', 'chair');
+addProduct('Cthulhu Action-figure', '../img/cthulhu.jpg', 'cthulhu');
+addProduct('Duck muzzle', '../img/dog-duck.jpg', 'dogDuck');
+addProduct('Can of Dragon Meat', '../img/dragon.jpg', 'dragon');
+addProduct('Pen Utensils', '../img/pen.jpg', 'pen');
+addProduct('Mop Paws', '../img/pet-sweep.jpg', 'petSweep');
+addProduct('Pizza Scissors', '../img/scissors.jpg', 'scissors');
+addProduct('Shark Sleeping Bag', '../img/shark.jpg', 'shark');
+addProduct('Jammy-Mop', '../img/sweep.png', 'sweep');
+addProduct('Tauntaun Sleeping Bag', '../img/tauntaun.jpg', 'tauntaun');
+addProduct('Can of Unicorn Meat', '../img/unicorn.jpg', 'unicorn');
+addProduct('Self Watering Can', '../img/water-can.jpg', 'waterCan');
+addProduct('Awkward Wine Glass', '../img/wine-glass.jpg', 'wineGlass');
+
+getProducts();
+renderAllProducts();
