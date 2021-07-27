@@ -2,6 +2,7 @@
 // ---------------------- Global Variables -----------------
 const productList = [];
 const currentImages = [];
+// const previousImages = [];
 const productSec = document.getElementById('productSection');
 let resultsButton;
 let imagesToDisplay = 3;
@@ -55,32 +56,35 @@ function getRandomImage() {
   return productList[imageIndex];
 }
 
-function getProducts() { //Add check for some array after
+function getProducts() { //Add check for same array after
   for (let i = 0; i < imagesToDisplay; i++) {
     if (i === 0) {
       currentImages[i] = getRandomImage();
     } else {
-      currentImages[i] = repeatImageCheck();
+      currentImages[i] = repeatImageCheck(i);
     }
   }
+  // for (let i = 0; i < currentImages.length; i++) {
+  //   previousImages[i] = currentImages[i];
+  // }
 }
-
+// Not working properly
 function repeatImageCheck() {
   let currentImage = getRandomImage();
-  for (let checkIndex of currentImages) {
-    if (currentImage !== checkIndex) {
-      return currentImage;
-    } else {
+  for (let i = 0; i < currentImages.length; i++) {
+    if (currentImage.name === currentImages[i].name) {
       currentImage = getRandomImage();
+      i = 0;
     }
   }
+  return currentImage;
 }
 
 function renderAllProducts() {
-  for (let i = 0; i < currentImages.length; i++) {
+  for (let image of currentImages) {
     const articleElem = makeElem('article', productSec, null, null, null);
-    makeElem('h2', articleElem, currentImages[i].name, null, null);
-    makeElem('img', articleElem, null, currentImages[i].imagePath, currentImages[i].imageId);
+    makeElem('h2', articleElem, image.name, null, image.imageId);
+    makeElem('img', articleElem, null, image.imagePath, image.imageId);
   }
 }
 
@@ -92,11 +96,11 @@ function handleImageClick(event) {
   const articleId = event.target.id;
   productSec.innerHTML = '';
   clickCount++;
-  for (let i = 0; i < currentImages.length; i++) {
-    if (articleId === currentImages[i].imageId) {
-      currentImages[i].votes++;
+  for (let image of currentImages) {
+    if (articleId === image.imageId) {
+      image.votes++;
     }
-    currentImages[i].timesSeen++;
+    image.timesSeen++;
   }
   if (clickCount !== 10) {
     getProducts();
