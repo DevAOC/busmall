@@ -72,6 +72,7 @@ function getProducts() { //Add check for same array after
 function repeatImageCheck() {
   let currentImage = getRandomImage();
   for (let i = 0; i < currentImages.length; i++) {
+    console.log(currentImage);
     if (currentImage.name === currentImages[i].name) {
       currentImage = getRandomImage();
       i = 0;
