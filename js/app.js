@@ -8,6 +8,11 @@ const chartSec = document.getElementById('chartSection');
 let resultsButton;
 let imagesToDisplay = 3;
 let clickCount = 0;
+const productNames = [];
+const productVotes = [];
+const productColors = [];
+const productsSeen = [];
+const productPercentages = [];
 
 // ---------------------- Constructor Function -------------
 function Product(name, imagePath, imageId) {
@@ -25,7 +30,7 @@ Product.prototype.renderProduct = function (parent) {
 };
 Product.prototype.assignColor = function () {
   this.color = Math.floor(Math.random() * 16777215).toString(16);
-}
+};
 // -------------------- Global functions -----------------
 function addProduct(name, imagePath, imageId) {
   const product = new Product(name, imagePath, imageId);
@@ -54,7 +59,7 @@ function makeElem(tagName, parent, textContent, imageSrc, elemId, elemColor) {
     elem.setAttribute('id', elemId);
   }
   if (elemColor) {
-    elem.setAttribute('background-color', elemColor)
+    elem.setAttribute('background-color', elemColor);
   }
   parent.appendChild(elem);
   return elem;
@@ -103,7 +108,25 @@ function renderAllProducts() {
 // }
 
 // ------------------- Chart Specific Functions -----------------
+function renderChartElems() {
+  for (let i = 1; i < 4; i++) {
+    makeElem('canvas', chartSec, null, null, `chart${i}`, null);
+  }
+  renderCharts();
+}
+
+function getProductData() {
+  for (let product of productList) {
+    productNames.push(product.name);
+    productVotes.push(product.votes);
+    productColors.push(product.color);
+    productsSeen.push(product.timesSeen);
+    productPercentages.push(`${product.votes / product.timesSeen * 100}%`);
+  }
+}
+
 function renderCharts() {
+  getProductData();
   renderVoteChart();
   renderTimesSeenChart();
   renderPercentageChart();
@@ -111,14 +134,6 @@ function renderCharts() {
 
 function renderVoteChart() {
   const context = document.getElementById('chart1').getContext('2d');
-  const productNames = [];
-  const productVotes = [];
-  const productColors = [];
-  for (let product of productList) {
-    productNames.push(product.name);
-    productVotes.push(product.votes);
-    productColors.push(product.color);
-  }
   const voteChart = new Chart(context, {
     type: 'doughnut',
     data: {
@@ -143,21 +158,13 @@ function renderVoteChart() {
 
 function renderTimesSeenChart() {
   const context = document.getElementById('chart2').getContext('2d');
-  const productNames = [];
-  const productVotes = [];
-  const productColors = [];
-  for (let product of productList) {
-    productNames.push(product.name);
-    productVotes.push(product.votes);
-    productColors.push(product.color);
-  }
   const voteChart = new Chart(context, {
     type: 'doughnut',
     data: {
       labels: productNames,
       datasets: [{
-        label: 'Votes per Product',
-        data: productVotes,
+        label: 'Times Seen',
+        data: productsSeen,
         backgroundColor: productColors,
         borderColor: productColors,
         borderWidth: 1
@@ -175,21 +182,13 @@ function renderTimesSeenChart() {
 
 function renderPercentageChart() {
   const context = document.getElementById('chart3').getContext('2d');
-  const productNames = [];
-  const productVotes = [];
-  const productColors = [];
-  for (let product of productList) {
-    productNames.push(product.name);
-    productVotes.push(product.votes);
-    productColors.push(product.color);
-  }
   const voteChart = new Chart(context, {
     type: 'doughnut',
     data: {
       labels: productNames,
       datasets: [{
-        label: 'Votes per Product',
-        data: productVotes,
+        label: 'Percent of Votes to Times Seen',
+        data: productPercentages, // Calculate percentage
         backgroundColor: productColors,
         borderColor: productColors,
         borderWidth: 1
@@ -203,7 +202,7 @@ function renderPercentageChart() {
       }
     }
   });
-
+}
 // -------------------- Handlers ----------------------
 function handleImageClick(event) {
   const articleId = event.target.id;
@@ -231,10 +230,7 @@ function handleButtonClick() {
   for (let product of productList) {
     makeElem('li', resultsList, `${product.name}: ${product.votes}`, null, null, product.color);
   }
-  makeElem();
-  makeElem();
-  makeElem();
-  renderCharts();
+  renderChartElems();
 }
 
 // -------------------- Listener -----------------------
@@ -261,7 +257,4 @@ addProduct('Can of Unicorn Meat', '../img/unicorn.jpg', 'unicorn');
 addProduct('Self Watering Can', '../img/water-can.jpg', 'waterCan');
 addProduct('Awkward Wine Glass', '../img/wine-glass.jpg', 'wineGlass');
 
-for (let product of productList) {
-  product.color = assignColor();
-}
 renderAllProducts();
