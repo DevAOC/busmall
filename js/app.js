@@ -2,7 +2,7 @@
 // ---------------------- Global Variables -----------------
 const productList = [];
 const currentImages = [];
-// const previousImages = [];
+const previousImages = [];
 const productSec = document.getElementById('productSection');
 const chartSec = document.getElementById('chartSection');
 let resultsButton;
@@ -25,11 +25,16 @@ function Product(name, imagePath, imageId) {
 }
 // --------------------- Prototypes ---------------------
 Product.prototype.renderProduct = function (parent) {
-  makeElem('h2', parent, this.name, null, this.imageId, null);
-  makeElem('img', parent, null, this.imagePath, this.imageId, null);
+  makeElem('h2', parent, this.name, null, this.imageId);
+  makeElem('img', parent, null, this.imagePath, this.imageId);
 };
 Product.prototype.assignColor = function () {
-  this.color = Math.floor(Math.random() * 16777215).toString(16);
+  let letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  this.color = color;
 };
 // -------------------- Global functions -----------------
 function addProduct(name, imagePath, imageId) {
@@ -47,7 +52,7 @@ function checkProductExistance(product) {
   return exists;
 }
 
-function makeElem(tagName, parent, textContent, imageSrc, elemId, elemColor) {
+function makeElem(tagName, parent, textContent, imageSrc, elemId) {
   let elem = document.createElement(tagName);
   if (textContent) {
     elem.textContent = textContent;
@@ -57,9 +62,6 @@ function makeElem(tagName, parent, textContent, imageSrc, elemId, elemColor) {
   }
   if (elemId) {
     elem.setAttribute('id', elemId);
-  }
-  if (elemColor) {
-    elem.setAttribute('background-color', elemColor);
   }
   parent.appendChild(elem);
   return elem;
@@ -78,9 +80,9 @@ function getProducts() { //Add check for different than previous array
       currentImages[i] = repeatImageCheck();
     }
   }
-  // for (let i = 0; i < currentImages.length; i++) {
-  //   previousImages[i] = currentImages[i];
-  // }
+  for (let i = 0; i < currentImages.length; i++) {
+    previousImages[i] = currentImages[i];
+  }
 }
 
 function repeatImageCheck() {
@@ -97,7 +99,7 @@ function repeatImageCheck() {
 
 function renderAllProducts() {
   getProducts();
-  const articleElem = makeElem('article', productSec, null, null, null, null);
+  const articleElem = makeElem('article', productSec, null, null, null);
   for (let image of currentImages) {
     image.renderProduct(articleElem);
   }
@@ -110,7 +112,7 @@ function renderAllProducts() {
 // ------------------- Chart Specific Functions -----------------
 function renderChartElems() {
   for (let i = 1; i < 4; i++) {
-    makeElem('canvas', chartSec, null, null, `chart${i}`, null);
+    makeElem('canvas', chartSec, null, null, `chart${i}`);
   }
   renderCharts();
 }
@@ -121,7 +123,7 @@ function getProductData() {
     productVotes.push(product.votes);
     productColors.push(product.color);
     productsSeen.push(product.timesSeen);
-    productPercentages.push(`${product.votes / product.timesSeen * 100}%`);
+    productPercentages.push(product.votes / product.timesSeen * 100);
   }
 }
 
@@ -147,18 +149,18 @@ function renderVoteChart() {
       }]
     },
     options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
+      // scales: {
+      //   y: {
+      //     beginAtZero: true
+      //   }
+      // }
     }
   });
 }
 
 function renderTimesSeenChart() {
   const context = document.getElementById('chart2').getContext('2d');
-  const voteChart = new Chart(context, {
+  const timesSeenChart = new Chart(context, {
     type: 'doughnut',
     data: {
       labels: productNames,
@@ -171,35 +173,35 @@ function renderTimesSeenChart() {
       }]
     },
     options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
+      // scales: {
+      //   y: {
+      //     beginAtZero: true
+      //   }
+      // }
     }
   });
 }
 
 function renderPercentageChart() {
   const context = document.getElementById('chart3').getContext('2d');
-  const voteChart = new Chart(context, {
+  const percentageChart = new Chart(context, {
     type: 'doughnut',
     data: {
       labels: productNames,
       datasets: [{
         label: 'Percent of Votes to Times Seen',
-        data: productPercentages, // Calculate percentage
+        data: productPercentages,
         backgroundColor: productColors,
         borderColor: productColors,
         borderWidth: 1
       }]
     },
     options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
+      // scales: {
+      //   y: {
+      //     beginAtZero: true
+      //   }
+      // }
     }
   });
 }
@@ -218,7 +220,7 @@ function handleImageClick(event) {
     renderAllProducts();
   } else {
     productSec.removeEventListener('click', handleImageClick);
-    resultsButton = makeElem('button', productSec, 'View Results', null, 'resultsButton', null);
+    resultsButton = makeElem('button', productSec, 'View Results', null, 'resultsButton');
     resultsButton.addEventListener('click', handleButtonClick);
   }
 }
@@ -226,9 +228,9 @@ function handleImageClick(event) {
 function handleButtonClick() {
   resultsButton.removeEventListener('click', handleButtonClick);
   productSec.innerHTML = '';
-  const resultsList = makeElem('ul', productSec, null, null, 'resultsList', null);
+  const resultsList = makeElem('ul', productSec, null, null, 'resultsList');
   for (let product of productList) {
-    makeElem('li', resultsList, `${product.name}: ${product.votes}`, null, null, product.color);
+    makeElem('li', resultsList, `${product.name}: ${product.votes}`, null, null);
   }
   renderChartElems();
 }
@@ -257,4 +259,7 @@ addProduct('Can of Unicorn Meat', '../img/unicorn.jpg', 'unicorn');
 addProduct('Self Watering Can', '../img/water-can.jpg', 'waterCan');
 addProduct('Awkward Wine Glass', '../img/wine-glass.jpg', 'wineGlass');
 
+for (let product of productList) {
+  product.assignColor();
+}
 renderAllProducts();
