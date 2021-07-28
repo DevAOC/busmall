@@ -74,11 +74,7 @@ function getRandomImage() {
 
 function getProducts() { //Add check for different than previous array
   for (let i = 0; i < imagesToDisplay; i++) {
-    if (i < 0) {
-      currentImages[i] = getRandomImage();
-    } else {
-      currentImages[i] = repeatImageCheck();
-    }
+    currentImages[i] = repeatImageCheck();
   }
   for (let i = 0; i < currentImages.length; i++) {
     previousImages[i] = currentImages[i];
@@ -87,11 +83,10 @@ function getProducts() { //Add check for different than previous array
 
 function repeatImageCheck() {
   let currentImage = getRandomImage();
-  restartLoop:
-  for (let i = 0; i < currentImages.length; i++) {
-    if (currentImages.includes(currentImage)) {
+  while (currentImages.includes(currentImage)) {
+    currentImage = getRandomImage();
+    while (previousImages.includes(currentImage)) {
       currentImage = getRandomImage();
-      continue restartLoop;
     }
   }
   return currentImage;
