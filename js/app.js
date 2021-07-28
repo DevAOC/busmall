@@ -2,11 +2,17 @@
 // ---------------------- Global Variables -----------------
 const productList = [];
 const currentImages = [];
-// const previousImages = [];
+const previousImages = [];
 const productSec = document.getElementById('productSection');
+const chartSec = document.getElementById('chartSection');
 let resultsButton;
 let imagesToDisplay = 3;
 let clickCount = 0;
+const productNames = [];
+const productVotes = [];
+const productColors = [];
+const productsSeen = [];
+const productPercentages = [];
 
 // ---------------------- Constructor Function -------------
 function Product(name, imagePath, imageId) {
@@ -15,11 +21,20 @@ function Product(name, imagePath, imageId) {
   this.imageId = imageId;
   this.votes = 0;
   this.timesSeen = 0;
+  this.color;
 }
 // --------------------- Prototypes ---------------------
-Product.prototype.renderProduct = function(parent) {
+Product.prototype.renderProduct = function (parent) {
   makeElem('h2', parent, this.name, null, this.imageId);
   makeElem('img', parent, null, this.imagePath, this.imageId);
+};
+Product.prototype.assignColor = function () {
+  let letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  this.color = color;
 };
 // -------------------- Global functions -----------------
 function addProduct(name, imagePath, imageId) {
@@ -31,10 +46,8 @@ function addProduct(name, imagePath, imageId) {
 
 function checkProductExistance(product) {
   let exists = false;
-  for (let item of productList) {
-    if(item.name === product.name) {
-      exists = true;
-    }
+  if(productList.includes(product)) {
+    exists = true;
   }
   return exists;
 }
@@ -59,32 +72,28 @@ function getRandomImage() {
   return productList[imageIndex];
 }
 
-function getProducts() { //Add check for same array after
+function getProducts() { //Add check for different than previous array
   for (let i = 0; i < imagesToDisplay; i++) {
-    if (i === 0) {
-      currentImages[i] = getRandomImage();
-    } else {
-      currentImages[i] = repeatImageCheck(i);
-    }
+    currentImages[i] = repeatImageCheck();
   }
-  // for (let i = 0; i < currentImages.length; i++) {
-  //   previousImages[i] = currentImages[i];
-  // }
+  for (let i = 0; i < currentImages.length; i++) {
+    previousImages[i] = currentImages[i];
+  }
 }
 
 function repeatImageCheck() {
   let currentImage = getRandomImage();
-  for (let i = 0; i < currentImages.length; i++) {
-    console.log(currentImage);
-    if (currentImage.name === currentImages[i].name) {
+  while (currentImages.includes(currentImage)) {
+    currentImage = getRandomImage();
+    while (previousImages.includes(currentImage)) {
       currentImage = getRandomImage();
-      i = 0;
     }
   }
   return currentImage;
 }
 
 function renderAllProducts() {
+  getProducts();
   const articleElem = makeElem('article', productSec, null, null, null);
   for (let image of currentImages) {
     image.renderProduct(articleElem);
@@ -94,6 +103,103 @@ function renderAllProducts() {
 // function setImagesToDisplay(amount) {
 //   imagesToDisplay = amount;
 // }
+
+// ------------------- Chart Specific Functions -----------------
+function renderChartElems() {
+  for (let i = 1; i < 4; i++) {
+    makeElem('canvas', chartSec, null, null, `chart${i}`);
+  }
+  renderCharts();
+}
+
+function getProductData() {
+  for (let product of productList) {
+    productNames.push(product.name);
+    productVotes.push(product.votes);
+    productColors.push(product.color);
+    productsSeen.push(product.timesSeen);
+    productPercentages.push(product.votes / product.timesSeen * 100);
+  }
+}
+
+function renderCharts() {
+  getProductData();
+  renderVoteChart();
+  renderTimesSeenChart();
+  renderPercentageChart();
+}
+
+function renderVoteChart() {
+  const context = document.getElementById('chart1').getContext('2d');
+  const voteChart = new Chart(context, {
+    type: 'doughnut',
+    data: {
+      labels: productNames,
+      datasets: [{
+        label: 'Votes per Product',
+        data: productVotes,
+        backgroundColor: productColors,
+        borderColor: productColors,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      // scales: {
+      //   y: {
+      //     beginAtZero: true
+      //   }
+      // }
+    }
+  });
+}
+
+function renderTimesSeenChart() {
+  const context = document.getElementById('chart2').getContext('2d');
+  const timesSeenChart = new Chart(context, {
+    type: 'doughnut',
+    data: {
+      labels: productNames,
+      datasets: [{
+        label: 'Times Seen',
+        data: productsSeen,
+        backgroundColor: productColors,
+        borderColor: productColors,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      // scales: {
+      //   y: {
+      //     beginAtZero: true
+      //   }
+      // }
+    }
+  });
+}
+
+function renderPercentageChart() {
+  const context = document.getElementById('chart3').getContext('2d');
+  const percentageChart = new Chart(context, {
+    type: 'doughnut',
+    data: {
+      labels: productNames,
+      datasets: [{
+        label: 'Percent of Votes to Times Seen',
+        data: productPercentages,
+        backgroundColor: productColors,
+        borderColor: productColors,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      // scales: {
+      //   y: {
+      //     beginAtZero: true
+      //   }
+      // }
+    }
+  });
+}
 // -------------------- Handlers ----------------------
 function handleImageClick(event) {
   const articleId = event.target.id;
@@ -106,7 +212,6 @@ function handleImageClick(event) {
     image.timesSeen++;
   }
   if (clickCount !== 10) {
-    getProducts();
     renderAllProducts();
   } else {
     productSec.removeEventListener('click', handleImageClick);
@@ -120,13 +225,15 @@ function handleButtonClick() {
   productSec.innerHTML = '';
   const resultsList = makeElem('ul', productSec, null, null, 'resultsList');
   for (let product of productList) {
-    makeElem('li', resultsList, `${product.name}: ${product.votes}`);
+    makeElem('li', resultsList, `${product.name}: ${product.votes}`, null, null);
   }
+  renderChartElems();
 }
+
 // -------------------- Listener -----------------------
 productSec.addEventListener('click', handleImageClick);
 // ------------------ Function Calls ----------------
-
+// Make this dynamic
 addProduct('R2D2 Luggage', '../img/bag.jpg', 'bag');
 addProduct('Banana Slicer', '../img/banana.jpg', 'banana');
 addProduct('iPad Stand', '../img/bathroom.jpg', 'bathroom');
@@ -147,5 +254,7 @@ addProduct('Can of Unicorn Meat', '../img/unicorn.jpg', 'unicorn');
 addProduct('Self Watering Can', '../img/water-can.jpg', 'waterCan');
 addProduct('Awkward Wine Glass', '../img/wine-glass.jpg', 'wineGlass');
 
-getProducts();
+for (let product of productList) {
+  product.assignColor();
+}
 renderAllProducts();
