@@ -109,18 +109,17 @@ function renderAllProducts() {
 
 // Issue probably stems from one of these two functions
 function putProductsInStorage() {
-  for (let product of productList) {
-    let stringifiedArray = JSON.stringify(product);
-    localStorage.setItem('products', stringifiedArray);
-  }
+  let stringifiedArray = JSON.stringify(productList);
+  localStorage.setItem('products', stringifiedArray);
 }
 
 function getProductsFromStorage() {
   if (storedProducts) {
     let parsedStorage = JSON.parse(storedProducts);
-    console.log(parsedStorage);
+    console.log('Parsed Storage:::::', parsedStorage);
     for (let product of parsedStorage) {
       let newProduct = new Product(product.name, product.imagePath, product.imageId, product.votes, product.timesSeen, product.color);
+      console.log('newProduct:::::::::', newProduct);
       productList.push(newProduct);
     }
   }
@@ -236,8 +235,8 @@ function handleImageClick(event) {
   }
   if (clickCount !== 10) {
     renderAllProducts();
-  } else {
     putProductsInStorage();
+  } else {
     productSec.removeEventListener('click', handleImageClick);
     resultsButton = makeElem('button', productSec, 'View Results', null, 'resultsButton');
     resultsButton.addEventListener('click', handleButtonClick);
