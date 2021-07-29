@@ -5,6 +5,7 @@ const currentImages = [];
 const previousImages = [];
 const productSec = document.getElementById('productSection');
 const chartSec = document.getElementById('chartSection');
+const storedProducts = localStorage.getItem('products');
 let resultsButton;
 let imagesToDisplay = 3;
 let clickCount = 0;
@@ -104,6 +105,27 @@ function renderAllProducts() {
 //   imagesToDisplay = amount;
 // }
 
+// ------------------ Local Storage Functions-------------
+
+// Issue probably stems from one of these two functions
+function putProductsInStorage() {
+  for (let product of productList) {
+    let stringifiedArray = JSON.stringify(product);
+    localStorage.setItem('products', stringifiedArray);
+  }
+}
+
+function getProductsFromStorage() {
+  if (storedProducts) {
+    let parsedStorage = JSON.parse(storedProducts);
+    console.log(parsedStorage);
+    for (let product of parsedStorage) {
+      let newProduct = new Product(product.name, product.imagePath, product.imageId, product.votes, product.timesSeen, product.color);
+      productList.push(newProduct);
+    }
+  }
+}
+
 // ------------------- Chart Specific Functions -----------------
 function renderChartElems() {
   for (let i = 1; i < 4; i++) {
@@ -202,6 +224,7 @@ function renderPercentageChart() {
 }
 // -------------------- Handlers ----------------------
 function handleImageClick(event) {
+  event.preventDefault();
   const articleId = event.target.id;
   productSec.innerHTML = '';
   clickCount++;
@@ -214,6 +237,7 @@ function handleImageClick(event) {
   if (clickCount !== 10) {
     renderAllProducts();
   } else {
+    putProductsInStorage();
     productSec.removeEventListener('click', handleImageClick);
     resultsButton = makeElem('button', productSec, 'View Results', null, 'resultsButton');
     resultsButton.addEventListener('click', handleButtonClick);
@@ -234,27 +258,31 @@ function handleButtonClick() {
 productSec.addEventListener('click', handleImageClick);
 // ------------------ Function Calls ----------------
 // Make this dynamic
-addProduct('R2D2 Luggage', '../img/bag.jpg', 'bag');
-addProduct('Banana Slicer', '../img/banana.jpg', 'banana');
-addProduct('iPad Stand', '../img/bathroom.jpg', 'bathroom');
-addProduct('Open Toe Boots', '../img/boots.jpg', 'boots');
-addProduct('Breakfast Machine', '../img/breakfast.jpg', 'breafast');
-addProduct('Meatball Bubblegum', '../img/bubblegum.jpg', 'bubblegum');
-addProduct('Convexed-seat Chair', '../img/chair.jpg', 'chair');
-addProduct('Cthulhu Action-figure', '../img/cthulhu.jpg', 'cthulhu');
-addProduct('Duck muzzle', '../img/dog-duck.jpg', 'dogDuck');
-addProduct('Can of Dragon Meat', '../img/dragon.jpg', 'dragon');
-addProduct('Pen Utensils', '../img/pen.jpg', 'pen');
-addProduct('Mop Paws', '../img/pet-sweep.jpg', 'petSweep');
-addProduct('Pizza Scissors', '../img/scissors.jpg', 'scissors');
-addProduct('Shark Sleeping Bag', '../img/shark.jpg', 'shark');
-addProduct('Jammy-Mop', '../img/sweep.png', 'sweep');
-addProduct('Tauntaun Sleeping Bag', '../img/tauntaun.jpg', 'tauntaun');
-addProduct('Can of Unicorn Meat', '../img/unicorn.jpg', 'unicorn');
-addProduct('Self Watering Can', '../img/water-can.jpg', 'waterCan');
-addProduct('Awkward Wine Glass', '../img/wine-glass.jpg', 'wineGlass');
-
-for (let product of productList) {
-  product.assignColor();
+if (storedProducts === null) {
+  addProduct('R2D2 Luggage', '../img/bag.jpg', 'bag');
+  addProduct('Banana Slicer', '../img/banana.jpg', 'banana');
+  addProduct('iPad Stand', '../img/bathroom.jpg', 'bathroom');
+  addProduct('Open Toe Boots', '../img/boots.jpg', 'boots');
+  addProduct('Breakfast Machine', '../img/breakfast.jpg', 'breafast');
+  addProduct('Meatball Bubblegum', '../img/bubblegum.jpg', 'bubblegum');
+  addProduct('Convexed-seat Chair', '../img/chair.jpg', 'chair');
+  addProduct('Cthulhu Action-figure', '../img/cthulhu.jpg', 'cthulhu');
+  addProduct('Duck muzzle', '../img/dog-duck.jpg', 'dogDuck');
+  addProduct('Can of Dragon Meat', '../img/dragon.jpg', 'dragon');
+  addProduct('Pen Utensils', '../img/pen.jpg', 'pen');
+  addProduct('Mop Paws', '../img/pet-sweep.jpg', 'petSweep');
+  addProduct('Pizza Scissors', '../img/scissors.jpg', 'scissors');
+  addProduct('Shark Sleeping Bag', '../img/shark.jpg', 'shark');
+  addProduct('Jammy-Mop', '../img/sweep.png', 'sweep');
+  addProduct('Tauntaun Sleeping Bag', '../img/tauntaun.jpg', 'tauntaun');
+  addProduct('Can of Unicorn Meat', '../img/unicorn.jpg', 'unicorn');
+  addProduct('Self Watering Can', '../img/water-can.jpg', 'waterCan');
+  addProduct('Awkward Wine Glass', '../img/wine-glass.jpg', 'wineGlass');
+  for (let product of productList) {
+    product.assignColor();
+  }
+  renderAllProducts();
+} else {
+  getProductsFromStorage();
+  renderAllProducts();
 }
-renderAllProducts();
