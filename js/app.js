@@ -5,7 +5,6 @@ const currentImages = [];
 const previousImages = [];
 const productSec = document.getElementById('productSection');
 const chartSec = document.getElementById('chartSection');
-const storedProducts = localStorage.getItem('products');
 let resultsButton;
 let imagesToDisplay = 3;
 let clickCount = 0;
@@ -109,19 +108,21 @@ function renderAllProducts() {
 
 // Issue probably stems from one of these two functions
 function putProductsInStorage() {
-  for (let product of productList) {
-    let stringifiedArray = JSON.stringify(product);
-    localStorage.setItem('products', stringifiedArray);
-  }
+  let stringifiedArray = JSON.stringify(productList);
+  localStorage.setItem('products', stringifiedArray);
 }
 
 function getProductsFromStorage() {
+  const storedProducts = localStorage.getItem('products');
   if (storedProducts) {
     let parsedStorage = JSON.parse(storedProducts);
     console.log(parsedStorage);
     for (let product of parsedStorage) {
-      let newProduct = new Product(product.name, product.imagePath, product.imageId, product.votes, product.timesSeen, product.color);
-      productList.push(newProduct);
+      let newProduct = new Product(product.name, product.imagePath, product.imageId);
+      newProduct.votes = product.votes;
+      newProduct.timesSeen = product.timesSeen;
+      newProduct.color = product.color;
+      productList.push(newProduct); // I was thinking that Ryan's way of doing it might work well here if this object creation is the issue this new object might not be being used
     }
   }
 }
@@ -129,7 +130,7 @@ function getProductsFromStorage() {
 // ------------------- Chart Specific Functions -----------------
 function renderChartElems() {
   for (let i = 1; i < 4; i++) {
-    makeElem('canvas', chartSec, null, null, `chart${i}`);
+    makeElem('canvas', chartSec, null, null, `chart${i}`, null);
   }
   renderCharts();
 }
@@ -258,7 +259,7 @@ function handleButtonClick() {
 productSec.addEventListener('click', handleImageClick);
 // ------------------ Function Calls ----------------
 // Make this dynamic
-if (storedProducts === null) {
+if (!localStorage.products) {
   addProduct('R2D2 Luggage', '../img/bag.jpg', 'bag');
   addProduct('Banana Slicer', '../img/banana.jpg', 'banana');
   addProduct('iPad Stand', '../img/bathroom.jpg', 'bathroom');
@@ -286,3 +287,6 @@ if (storedProducts === null) {
   getProductsFromStorage();
   renderAllProducts();
 }
+
+// When I comment out everything I added for local storage, my app works well, that means that it is speciifically  the functions, the calls, or the if else that I have just above. I am leaning towards the if else because I checked my logic for the functions amd my call placement and they were good.
+// Might have to switch these around. I think the 'if' is where I am actually getting the issue but my storage isnt grabbing the color and it looks like it is not adding the mounts to the items in storage. It might be a conflict with the new items and the local storage items. One thing that is bizarre is that my products are already in the storage even when I clear and refresh.
