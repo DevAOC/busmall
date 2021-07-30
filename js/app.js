@@ -116,13 +116,14 @@ function getProductsFromStorage() {
   const storedProducts = localStorage.getItem('products');
   if (storedProducts) {
     let parsedStorage = JSON.parse(storedProducts);
-    console.log(parsedStorage);
+    console.log('Parsed Storage:::::', parsedStorage);
     for (let product of parsedStorage) {
       let newProduct = new Product(product.name, product.imagePath, product.imageId);
       newProduct.votes = product.votes;
       newProduct.timesSeen = product.timesSeen;
       newProduct.color = product.color;
       productList.push(newProduct); // I was thinking that Ryan's way of doing it might work well here if this object creation is the issue this new object might not be being used
+
     }
   }
 }
@@ -237,8 +238,8 @@ function handleImageClick(event) {
   }
   if (clickCount !== 10) {
     renderAllProducts();
-  } else {
     putProductsInStorage();
+  } else {
     productSec.removeEventListener('click', handleImageClick);
     resultsButton = makeElem('button', productSec, 'View Results', null, 'resultsButton');
     resultsButton.addEventListener('click', handleButtonClick);
