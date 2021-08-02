@@ -275,25 +275,25 @@ productSec.addEventListener('click', handleImageClick);
 // ------------------ Function Calls ----------------
 
 if (!localStorage.products) {
-  addProduct('R2D2 Luggage', 'img/bag.jpg', 'bag');
-  addProduct('Banana Slicer', 'img/banana.jpg', 'banana');
-  addProduct('iPad Stand', 'img/bathroom.jpg', 'bathroom');
-  addProduct('Open Toe Boots', 'img/boots.jpg', 'boots');
-  addProduct('Breakfast Machine', 'img/breakfast.jpg', 'breafast');
-  addProduct('Meatball Bubblegum', 'img/bubblegum.jpg', 'bubblegum');
-  addProduct('Convexed-seat Chair', 'img/chair.jpg', 'chair');
-  addProduct('Cthulhu Action-figure', 'img/cthulhu.jpg', 'cthulhu');
-  addProduct('Duck muzzle', 'img/dog-duck.jpg', 'dogDuck');
-  addProduct('Can of Dragon Meat', 'img/dragon.jpg', 'dragon');
-  addProduct('Pen Utensils', 'img/pen.jpg', 'pen');
-  addProduct('Mop Paws', 'img/pet-sweep.jpg', 'petSweep');
-  addProduct('Pizza Scissors', 'img/scissors.jpg', 'scissors');
-  addProduct('Shark Sleeping Bag', 'img/shark.jpg', 'shark');
-  addProduct('Jammy-Mop', 'img/sweep.png', 'sweep');
-  addProduct('Tauntaun Sleeping Bag', 'img/tauntaun.jpg', 'tauntaun');
-  addProduct('Can of Unicorn Meat', 'img/unicorn.jpg', 'unicorn');
-  addProduct('Self Watering Can', 'img/water-can.jpg', 'waterCan');
-  addProduct('Awkward Wine Glass', 'img/wine-glass.jpg', 'wineGlass');
+  addProduct('R2D2 Luggage', '../img/bag.jpg', 'bag');
+  addProduct('Banana Slicer', '../img/banana.jpg', 'banana');
+  addProduct('iPad Stand', '../img/bathroom.jpg', 'bathroom');
+  addProduct('Open Toe Boots', '../img/boots.jpg', 'boots');
+  addProduct('Breakfast Machine', '../img/breakfast.jpg', 'breafast');
+  addProduct('Meatball Bubblegum', '../img/bubblegum.jpg', 'bubblegum');
+  addProduct('Convexed-seat Chair', '../img/chair.jpg', 'chair');
+  addProduct('Cthulhu Action-figure', '../img/cthulhu.jpg', 'cthulhu');
+  addProduct('Duck muzzle', '../img/dog-duck.jpg', 'dogDuck');
+  addProduct('Can of Dragon Meat', '../img/dragon.jpg', 'dragon');
+  addProduct('Pen Utensils', '../img/pen.jpg', 'pen');
+  addProduct('Mop Paws', '../img/pet-sweep.jpg', 'petSweep');
+  addProduct('Pizza Scissors', '../img/scissors.jpg', 'scissors');
+  addProduct('Shark Sleeping Bag', '../img/shark.jpg', 'shark');
+  addProduct('Jammy-Mop', '../img/sweep.png', 'sweep');
+  addProduct('Tauntaun Sleeping Bag', '../img/tauntaun.jpg', 'tauntaun');
+  addProduct('Can of Unicorn Meat', '../img/unicorn.jpg', 'unicorn');
+  addProduct('Self Watering Can', '../img/water-can.jpg', 'waterCan');
+  addProduct('Awkward Wine Glass', '../img/wine-glass.jpg', 'wineGlass');
   for (let product of productList) {
     product.assignColor();
   }
