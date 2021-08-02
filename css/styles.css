@@ -1,0 +1,77 @@
+body,
+body > main > section {
+  display: flex;
+  flex-direction: column;
+  background: wheat;
+}
+header {
+  display: flex;
+  /* align-items: center; */
+  height: 100px;
+  width: 100%;
+  justify-content: center;
+  /* align-content: center; */
+  align-items: center;
+  margin-bottom: 15px;
+  background: steelblue;
+}
+header > h1 {
+  /* text-align: center; */
+  font-size: 50px;
+  color: white;
+}
+h2 {
+  text-align: center;
+  margin-top: 15px;
+  margin-bottom: 30px;
+  font-size: 30px;
+}
+section {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+ul {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+#productSection {
+  display: grid;
+}
+#chartSection {
+  display: none;
+}
+main > section > ul {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-rows: repeat(auto-fill, 250px);
+}
+main > section > ul > li {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 250px;
+  overflow: hidden;
+}
+main > section > ul > li > img {
+  height: 100%;
+  width: auto;
+}
+#chartSection > ul {
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(500px, auto));
+}
+main > section > #resultsList {
+  grid-template-rows: repeat(auto-fill, 16px);
+}
+#chartSection > ul > li {
+  height: auto;
+}
+footer {
+  margin-top: 15px;
+  padding: 30px;
+  height: fit-content;
+  width: auto;
+}
+
+/* Make id to target results list so that it does not have ridiculous spacing */

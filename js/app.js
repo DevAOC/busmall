@@ -13,6 +13,86 @@ const productVotes = [];
 const productColors = [];
 const productsSeen = [];
 const productPercentages = [];
+const chartData = [
+  {
+    id: 'voteChart',
+    chartOptions: {
+      type: 'doughnut',
+      data: {
+        labels: productNames,
+        datasets: [
+          {
+            data: productVotes,
+            backgroundColor: productColors,
+            borderColor: productColors,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Votes per Product',
+            font: { size: 20 },
+          },
+        },
+      },
+    },
+  },
+  {
+    id: 'timesSeenChart',
+    chartOptions: {
+      type: 'doughnut',
+      data: {
+        labels: productNames,
+        datasets: [
+          {
+            data: productsSeen,
+            backgroundColor: productColors,
+            borderColor: productColors,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Times Seen',
+            font: { size: 20 },
+          },
+        },
+      },
+    },
+  },
+  {
+    id: 'percentageChart',
+    chartOptions: {
+      type: 'doughnut',
+      data: {
+        labels: productNames,
+        datasets: [
+          {
+            data: productPercentages,
+            backgroundColor: productColors,
+            borderColor: productColors,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Percent of Votes to Times Seen',
+            font: { size: 20 },
+          },
+        },
+      },
+    },
+  },
+];
 
 // ---------------------- Constructor Function -------------
 function Product(name, imagePath, imageId) {
@@ -25,7 +105,7 @@ function Product(name, imagePath, imageId) {
 }
 // --------------------- Prototypes ---------------------
 Product.prototype.renderProduct = function (parent) {
-  makeElem('h2', parent, this.name, null, this.imageId);
+  makeElem('h3', parent, this.name, null, this.imageId);
   makeElem('img', parent, null, this.imagePath, this.imageId);
 };
 Product.prototype.assignColor = function () {
@@ -46,7 +126,7 @@ function addProduct(name, imagePath, imageId) {
 
 function checkProductExistance(product) {
   let exists = false;
-  if(productList.includes(product)) {
+  if (productList.includes(product)) {
     exists = true;
   }
   return exists;
@@ -54,6 +134,7 @@ function checkProductExistance(product) {
 
 function makeElem(tagName, parent, textContent, imageSrc, elemId) {
   let elem = document.createElement(tagName);
+  // const elemColor = '#f00';
   if (textContent) {
     elem.textContent = textContent;
   }
@@ -63,6 +144,9 @@ function makeElem(tagName, parent, textContent, imageSrc, elemId) {
   if (elemId) {
     elem.setAttribute('id', elemId);
   }
+  // if (elemColor) {
+  // elem.setAttribute('style', `background-color: ${elemColor}`);
+  // }
   parent.appendChild(elem);
   return elem;
 }
@@ -72,7 +156,7 @@ function getRandomImage() {
   return productList[imageIndex];
 }
 
-function getProducts() { //Add check for different than previous array
+function getProducts() {
   for (let i = 0; i < imagesToDisplay; i++) {
     currentImages[i] = repeatImageCheck();
   }
@@ -94,9 +178,10 @@ function repeatImageCheck() {
 
 function renderAllProducts() {
   getProducts();
-  const articleElem = makeElem('article', productSec, null, null, null);
+  const ulElem = makeElem('ul', productSec);
   for (let image of currentImages) {
-    image.renderProduct(articleElem);
+    const liElem = makeElem('li', ulElem);
+    image.renderProduct(liElem);
   }
 }
 
@@ -106,7 +191,6 @@ function renderAllProducts() {
 
 // ------------------ Local Storage Functions-------------
 
-// Issue probably stems from one of these two functions
 function putProductsInStorage() {
   let stringifiedArray = JSON.stringify(productList);
   localStorage.setItem('products', stringifiedArray);
@@ -122,18 +206,20 @@ function getProductsFromStorage() {
       newProduct.votes = product.votes;
       newProduct.timesSeen = product.timesSeen;
       newProduct.color = product.color;
-      productList.push(newProduct); // I was thinking that Ryan's way of doing it might work well here if this object creation is the issue this new object might not be being used
-
+      productList.push(newProduct);
     }
   }
 }
 
 // ------------------- Chart Specific Functions -----------------
 function renderChartElems() {
-  for (let i = 1; i < 4; i++) {
-    makeElem('canvas', chartSec, null, null, `chart${i}`, null);
-  }
-  renderCharts();
+  getProductData();
+  const ulElem = makeElem('ul', chartSec);
+  chartData.forEach(({ id, chartOptions }) => {
+    const liElem = makeElem('li', ulElem);
+    makeElem('canvas', liElem, null, null, id);
+    renderChart(id, chartOptions);
+  });
 }
 
 function getProductData() {
@@ -142,93 +228,18 @@ function getProductData() {
     productVotes.push(product.votes);
     productColors.push(product.color);
     productsSeen.push(product.timesSeen);
-    productPercentages.push(product.votes / product.timesSeen * 100);
+    productPercentages.push((product.votes / product.timesSeen) * 100);
   }
 }
 
-function renderCharts() {
-  getProductData();
-  renderVoteChart();
-  renderTimesSeenChart();
-  renderPercentageChart();
-}
-
-function renderVoteChart() {
-  const context = document.getElementById('chart1').getContext('2d');
-  const voteChart = new Chart(context, {
-    type: 'doughnut',
-    data: {
-      labels: productNames,
-      datasets: [{
-        label: 'Votes per Product',
-        data: productVotes,
-        backgroundColor: productColors,
-        borderColor: productColors,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      // scales: {
-      //   y: {
-      //     beginAtZero: true
-      //   }
-      // }
-    }
-  });
-}
-
-function renderTimesSeenChart() {
-  const context = document.getElementById('chart2').getContext('2d');
-  const timesSeenChart = new Chart(context, {
-    type: 'doughnut',
-    data: {
-      labels: productNames,
-      datasets: [{
-        label: 'Times Seen',
-        data: productsSeen,
-        backgroundColor: productColors,
-        borderColor: productColors,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      // scales: {
-      //   y: {
-      //     beginAtZero: true
-      //   }
-      // }
-    }
-  });
-}
-
-function renderPercentageChart() {
-  const context = document.getElementById('chart3').getContext('2d');
-  const percentageChart = new Chart(context, {
-    type: 'doughnut',
-    data: {
-      labels: productNames,
-      datasets: [{
-        label: 'Percent of Votes to Times Seen',
-        data: productPercentages,
-        backgroundColor: productColors,
-        borderColor: productColors,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      // scales: {
-      //   y: {
-      //     beginAtZero: true
-      //   }
-      // }
-    }
-  });
+function renderChart(id, options) {
+  const context = document.getElementById(id).getContext('2d');
+  new Chart(context, options);
 }
 // -------------------- Handlers ----------------------
 function handleImageClick(event) {
   event.preventDefault();
   const articleId = event.target.id;
-  productSec.innerHTML = '';
   clickCount++;
   for (let image of currentImages) {
     if (articleId === image.imageId) {
@@ -236,7 +247,9 @@ function handleImageClick(event) {
     }
     image.timesSeen++;
   }
-  if (clickCount !== 10) {
+  if (clickCount !== 5) {
+    productSec.innerHTML = '';
+    makeElem('h2', productSec, 'Which do you prefer?');
     renderAllProducts();
     putProductsInStorage();
   } else {
@@ -248,10 +261,11 @@ function handleImageClick(event) {
 
 function handleButtonClick() {
   resultsButton.removeEventListener('click', handleButtonClick);
-  productSec.innerHTML = '';
-  const resultsList = makeElem('ul', productSec, null, null, 'resultsList');
+  productSec.style = 'display: none';
+  chartSec.style = 'display: grid';
+  const resultsList = makeElem('ul', chartSec, null, null, 'resultsList');
   for (let product of productList) {
-    makeElem('li', resultsList, `${product.name}: ${product.votes}`, null, null);
+    makeElem('li', resultsList, `${product.name}: ${product.votes}`);
   }
   renderChartElems();
 }
@@ -259,7 +273,7 @@ function handleButtonClick() {
 // -------------------- Listener -----------------------
 productSec.addEventListener('click', handleImageClick);
 // ------------------ Function Calls ----------------
-// Make this dynamic
+
 if (!localStorage.products) {
   addProduct('R2D2 Luggage', '../img/bag.jpg', 'bag');
   addProduct('Banana Slicer', '../img/banana.jpg', 'banana');
@@ -288,6 +302,3 @@ if (!localStorage.products) {
   getProductsFromStorage();
   renderAllProducts();
 }
-
-// When I comment out everything I added for local storage, my app works well, that means that it is speciifically  the functions, the calls, or the if else that I have just above. I am leaning towards the if else because I checked my logic for the functions amd my call placement and they were good.
-// Might have to switch these around. I think the 'if' is where I am actually getting the issue but my storage isnt grabbing the color and it looks like it is not adding the mounts to the items in storage. It might be a conflict with the new items and the local storage items. One thing that is bizarre is that my products are already in the storage even when I clear and refresh.
